@@ -45,6 +45,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 class accountBulkCreate(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     csv_file = FileField(upload_to="bulkAccount/")
+    type = models.CharField(max_length=1, choices=(
+        ('T', 'Giảng viên'), ('S', 'Sinh viên')), blank=False, default='S')
 
     def __str__(self):
         return self.csv_file.name
