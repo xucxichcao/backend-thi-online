@@ -1,8 +1,6 @@
-from django.db import models
-from django.db.models import fields
 from rest_framework import serializers
 
-from accounts.models import CustomUser
+from accounts.models import CustomUser, accountBulkCreate
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -10,3 +8,9 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['email', 'full_name', 'date_of_birth',
                   'cid', 'sid', 'phone', 'school_name']
+
+
+class AccountBulkCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = accountBulkCreate
+        fields = ('user', 'csv_file')

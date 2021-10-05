@@ -16,6 +16,7 @@ Including another URLconf
 from allauth.account.views import confirm_email
 from django.contrib import admin
 from django.urls import path, include
+from accounts.urls import account_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,3 +26,4 @@ urlpatterns = [
     path('accounts/confirm/(?P<key>.+)/$',
          confirm_email, name='account_confirm_email'),
 ]
+urlpatterns += account_urlpatterns
