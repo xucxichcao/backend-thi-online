@@ -5,7 +5,8 @@ import csv
 import io
 from datetime import datetime
 from allauth.account.models import EmailAddress
-from accounts.models import CustomUser, accountBulkCreate
+from accounts.models import CustomUser, accountBulkCreate, SinhVien, GiangVien
+
 
 User = get_user_model()
 
@@ -13,8 +14,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['email', 'full_name', 'date_of_birth',
-                  'cid', 'sid', 'phone', 'school_name']
+        fields = ['email', 'role']
 
 
 class AccountBulkCreateSerializer(serializers.ModelSerializer):
@@ -23,6 +23,10 @@ class AccountBulkCreateSerializer(serializers.ModelSerializer):
         fields = ('user', 'csv_file', 'type')
 
     def create(self, validated_data):
+        school = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            school = request.user.scinfo
         accType = validated_data.get('type')
         if(accType == 'S'):
             csv_file = validated_data.get('csv_file')
@@ -31,10 +35,12 @@ class AccountBulkCreateSerializer(serializers.ModelSerializer):
             csvf = csv.reader(io_strings)
             for row in csvf:
                 try:
-                    user = User(sid=row[0], email=row[1], full_name=row[2],
-                                sex=row[3], cid=row[4], phone=row[5], date_of_birth=datetime.strptime(row[6], '%d-%m-%Y'))
-                    user.password = make_password("freepassword")
+                    user = User(email=row[1], student=True)
+                    user.password = make_password(row[3])
                     user.save()
+                    newSinhVien = SinhVien(
+                        user=user, full_name=row[2], sex=row[4], cid=row[5], phone=row[6], date_of_birth=datetime.strptime(row[7], '%d-%m-%Y'), school=school)
+                    newSinhVien.save()
                     newEmail = EmailAddress(
                         user=user, email=row[1], verified=True)
                     newEmail.save()
@@ -47,10 +53,12 @@ class AccountBulkCreateSerializer(serializers.ModelSerializer):
             csvf = csv.reader(io_strings)
             for row in csvf:
                 try:
-                    user = User(sid=row[0], email=row[1], full_name=row[2],
-                                sex=row[3], cid=row[4], phone=row[5], date_of_birth=datetime.strptime(row[6], '%d-%m-%Y'), teacher=True)
-                    user.password = make_password("freepassword")
+                    user = User(email=row[1], student=True)
+                    user.password = make_password(row[3])
                     user.save()
+                    newGiangVien = GiangVien(
+                        user=user, full_name=row[2], sex=row[4], cid=row[5], phone=row[6], date_of_birth=datetime.strptime(row[7], '%d-%m-%Y'), school=school)
+                    newGiangVien.save()
                     newEmail = EmailAddress(
                         user=user, email=row[1], verified=True)
                     newEmail.save()
