@@ -1,11 +1,12 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password
 import csv
 import io
 from datetime import datetime
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from allauth.account.models import EmailAddress
-from accounts.models import CustomUser, accountBulkCreate, SinhVien, GiangVien
+from accounts.models import CustomUser, accountBulkCreate
+from userprofiles.models import SinhVien, GiangVien
 
 
 User = get_user_model()

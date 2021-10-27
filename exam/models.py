@@ -1,5 +1,5 @@
 from django.db import models
-from accounts.models import GiangVien, SinhVien
+from userprofiles.models import GiangVien, SinhVien
 # Create your models here.
 
 

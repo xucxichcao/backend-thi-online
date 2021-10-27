@@ -29,4 +29,5 @@ def taoDeThi(sender, instance, created, **kwargs):
                 cauhoi['dapan' + str(sl)] = row[0]
             newCTDT = ChiTietDeThi(
                 deThi=instance, noiDung=json.dumps(cauhoi), dapAn=dapan)
+            newCTDT.save()
             cauhoi = dict()
