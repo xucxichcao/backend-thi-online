@@ -54,7 +54,7 @@ class AccountBulkCreateSerializer(serializers.ModelSerializer):
             csvf = csv.reader(io_strings)
             for row in csvf:
                 try:
-                    user = User(email=row[1], student=True)
+                    user = User(email=row[1], student=False, teacher=True)
                     user.password = make_password(row[3])
                     user.save()
                     newGiangVien = GiangVien(
