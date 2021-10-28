@@ -1,3 +1,4 @@
+from django.http import request
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
 from .models import DeThi, DiemThi, PhongThi
@@ -29,8 +30,12 @@ class giangVienDeThi(viewsets.ModelViewSet):
     serializer_class = themDeThi
 
     def get_queryset(self):
-        user = self.request.user
-        return DeThi.objects.filter(owner=user)
+        giangvien = self.request.user.gvinfo
+        return DeThi.objects.filter(created_by=giangvien)
+
+    def perform_create(self, serializer):
+        req = serializer.context['request']
+        serializer.save(created_by=req.user.gvinfo)
 
 
 class viewPhongThi(viewsets.ModelViewSet):

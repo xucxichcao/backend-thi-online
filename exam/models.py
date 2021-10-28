@@ -16,6 +16,7 @@ class DeThi(models.Model):
     soLuongCauHoi = models.PositiveSmallIntegerField()
     file = models.FileField(upload_to="deThi/")
     key = models.CharField(max_length=8, default=_createHash, unique=True)
+    created_by = models.ForeignKey(GiangVien, on_delete=models.CASCADE)
 
 
 class ChiTietDeThi(models.Model):
