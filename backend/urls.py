@@ -17,6 +17,7 @@ from allauth.account.views import confirm_email
 from django.contrib import admin
 from django.urls import path, include
 from accounts.urls import account_urlpatterns
+from exam.urls import exam_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,3 +26,4 @@ urlpatterns = [
     # path('api/accounts/', include('allauth.urls')),
 ]
 urlpatterns += account_urlpatterns
+urlpatterns += exam_urlpatterns

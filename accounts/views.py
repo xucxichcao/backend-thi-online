@@ -29,7 +29,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 
 class AccountBulkCreateViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsSchoolAccount, )
+    permission_classes = (IsSchoolAccount, permissions.IsAuthenticated)
     serializer_class = AccountBulkCreateSerializer
 
     def get_queryset(self):
