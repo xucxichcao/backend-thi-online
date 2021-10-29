@@ -1,5 +1,4 @@
-from django.db.models import fields
-from rest_framework import serializers, permissions
+from rest_framework import serializers
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
 
 
@@ -19,12 +18,6 @@ class svGetDeThi(serializers.ModelSerializer):
     class Meta:
         model = DeThi
         fields = ('id', 'soLuongCauHoi')
-
-
-class svThamGiaPhongThi(serializers.ModelSerializer):
-    class Meta:
-        model = DiemThi
-        fields = ('phongThi', 'sinhVien')
 
 
 class svGetListPhongThi(serializers.ModelSerializer):

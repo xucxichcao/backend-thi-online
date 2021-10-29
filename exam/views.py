@@ -1,10 +1,8 @@
 import datetime
-from django.http import response
 from django.shortcuts import render
-from rest_framework import viewsets, permissions, status
-from rest_framework.response import Response
+from rest_framework import viewsets, permissions
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
-from .serializers import svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi, svThamGiaPhongThi
+from .serializers import svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi
 
 
 # Permission
@@ -34,27 +32,6 @@ class isGiangVienAndOwner(permissions.BasePermission):
 
 
 # Create your views here.
-class svViewThamGiaPhongThi(viewsets.ModelViewSet):
-    permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly)
-    serializer_class = svThamGiaPhongThi
-
-    def list(self, request, *args, **kwargs):
-        response = {'message': 'Method GET is not allowed'}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def retrieve(self, request, *args, **kwargs):
-        response = {'message': 'Method GET is not allowed'}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def update(self, request, *args, **kwargs):
-        response = {'message': 'Method PUT is not allowed'}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def partial_update(self, request, *args, **kwargs):
-        response = {'message': 'Method PUT is not allowed'}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
 class svViewListPhongThi(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly)
     serializer_class = svGetListPhongThi
