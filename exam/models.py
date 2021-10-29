@@ -33,7 +33,7 @@ class PhongThi(models.Model):
     giangVien = models.ForeignKey(GiangVien, on_delete=models.CASCADE)
     danhSach = models.FileField(upload_to="danhSachPhongThi/")
     deThi = models.OneToOneField(
-        DeThi, related_name='phongthi', on_delete=models.CASCADE)
+        DeThi, related_name='phongthi', on_delete=models.CASCADE, null=True)
     thoiGianLamBai = models.PositiveSmallIntegerField()
     thoiGianThi = models.DateTimeField()
     namHoc = models.CharField(max_length=11)

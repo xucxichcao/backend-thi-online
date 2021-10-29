@@ -1,7 +1,10 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
-from .models import ChiTietDeThi, DeThi
+from .models import ChiTietDeThi, DeThi, DiemThi, PhongThi
 import json
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 @receiver(post_save, sender=DeThi)
@@ -33,3 +36,17 @@ def taoDeThi(sender, instance, created, **kwargs):
                                    deThi=instance, noiDung=json.dumps(cauhoi), dapAn=dapan)
             newCTDT.save()
             cauhoi = dict()
+
+        phongThi = PhongThi.objects.get(pk=instance.id)
+        phongThi.update(deThi=instance)
+
+
+@receiver(post_save, sender=PhongThi)
+def taoPhongThi(sender, instance, created, **kwargs):
+    if created:
+        csv_file = instance.file
+        for row in csv_file:
+            user = User.objects.get(email=row[0])
+            sinhvien = user.svinfo
+            newDiemThi = DiemThi(sinhVien=sinhvien, phongThi=instance)
+            newDiemThi.save()
