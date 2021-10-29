@@ -2,7 +2,7 @@ import datetime
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
-from .serializers import svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi
+from .serializers import gvPhongThi, svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi
 
 
 # Permission
@@ -71,13 +71,21 @@ class svCTDT(viewsets.ModelViewSet):
             return ChiTietDeThi.objects.none()
 
 
+class gvViewPhongThi(viewsets.ModelViewSet):
+    permission_classes = (isGiangVien, permissions.IsAuthenticated, )
+    serializer_class = gvPhongThi
+
+    def get_queryset(self):
+        return PhongThi.objects.filter(giangVien__user=self.request.user)
+
+
 class gvThemDeThi(viewsets.ModelViewSet):
     permission_classes = (isGiangVien, permissions.IsAuthenticated, )
     serializer_class = gvThemDeThi
 
     def get_queryset(self):
-        giangvien = self.request.user.gvinfo
-        return DeThi.objects.filter(createdBy=giangvien)
+        user = self.request.user
+        return DeThi.objects.filter(createdBy__user=user)
 
     def perform_create(self, serializer):
         req = serializer.context['request']

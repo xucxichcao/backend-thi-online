@@ -39,7 +39,7 @@ class gvGetChiTietDeThi(serializers.ModelSerializer):
         fields = ('questionID', 'noiDung', 'dapAn')
 
 
-class gvTaoPhongThi(serializers.ModelSerializer):
+class gvPhongThi(serializers.ModelSerializer):
     class Meta:
         model = PhongThi
         fields = ('tenPhongThi', 'siSo', 'giangVien', 'danhSach', 'deThi',
