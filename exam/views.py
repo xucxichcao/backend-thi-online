@@ -1,6 +1,8 @@
-from django.http import request
+import datetime
+from django.http import response
 from django.shortcuts import render
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
 from .serializers import svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi, svThamGiaPhongThi
 
@@ -30,29 +32,27 @@ class isGiangVienAndOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.deThi.createdBy.user == request.user
 
+
 # Create your views here.
-
-
-class gvThemDeThi(viewsets.ModelViewSet):
-    permission_classes = (isGiangVien, permissions.IsAuthenticated, )
-    serializer_class = gvThemDeThi
-
-    def get_queryset(self):
-        giangvien = self.request.user.gvinfo
-        return DeThi.objects.filter(createdBy=giangvien)
-
-    def perform_create(self, serializer):
-        req = serializer.context['request']
-        serializer.save(created_by=req.user.gvinfo)
-
-
-class viewPhongThi(viewsets.ModelViewSet):
+class svViewThamGiaPhongThi(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly)
     serializer_class = svThamGiaPhongThi
 
-    def get_queryset(self):
-        user = self.request.user
-        return DiemThi.objects.filter(sinhVien__user=user)
+    def list(self, request, *args, **kwargs):
+        response = {'message': 'Method GET is not allowed'}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def retrieve(self, request, *args, **kwargs):
+        response = {'message': 'Method GET is not allowed'}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        response = {'message': 'Method PUT is not allowed'}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        response = {'message': 'Method PUT is not allowed'}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class svViewListPhongThi(viewsets.ModelViewSet):
@@ -80,7 +80,7 @@ class svViewGetKeyDeThi(viewsets.ModelViewSet):
     serializer_class = svGetKeyDeThi
 
     def get_queryset(self):
-        return DeThi.objects.all()
+        return DeThi.objects.filter(phongthi__thoiGianThi__lte=datetime.datetime.now())
 
 
 class svCTDT(viewsets.ModelViewSet):
@@ -92,6 +92,19 @@ class svCTDT(viewsets.ModelViewSet):
             return ChiTietDeThi.objects.filter(deThi__key=self.request.data['key'])
         else:
             return ChiTietDeThi.objects.none()
+
+
+class gvThemDeThi(viewsets.ModelViewSet):
+    permission_classes = (isGiangVien, permissions.IsAuthenticated, )
+    serializer_class = gvThemDeThi
+
+    def get_queryset(self):
+        giangvien = self.request.user.gvinfo
+        return DeThi.objects.filter(createdBy=giangvien)
+
+    def perform_create(self, serializer):
+        req = serializer.context['request']
+        serializer.save(created_by=req.user.gvinfo)
 
 
 class gvCTDT(viewsets.ModelViewSet):

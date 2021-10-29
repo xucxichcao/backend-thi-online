@@ -24,7 +24,7 @@ class svGetDeThi(serializers.ModelSerializer):
 class svThamGiaPhongThi(serializers.ModelSerializer):
     class Meta:
         model = DiemThi
-        fields = ('phongThi', 'sinhVien', 'diem')
+        fields = ('phongThi', 'sinhVien')
 
 
 class svGetListPhongThi(serializers.ModelSerializer):
