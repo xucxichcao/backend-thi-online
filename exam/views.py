@@ -2,7 +2,7 @@ from django.http import request
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
-from .serializers import gvGetChiTietDeThi, svGetChiTietDeThi, getListPhongThi, themDeThi, thamGiaPhongThi
+from .serializers import svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, getListPhongThi, svGetDeThi, gvThemDeThi, svThamGiaPhongThi
 
 
 # Permission
@@ -28,14 +28,14 @@ class isGiangVienAndOwner(permissions.BasePermission):
         return request.user.teacher
 
     def has_object_permission(self, request, view, obj):
-        return obj.deThi.createdBy == request.user.gvinfo
+        return obj.deThi.createdBy.user == request.user
 
 # Create your views here.
 
 
 class giangVienDeThi(viewsets.ModelViewSet):
     permission_classes = (isGiangVien, permissions.IsAuthenticated, )
-    serializer_class = themDeThi
+    serializer_class = gvThemDeThi
 
     def get_queryset(self):
         giangvien = self.request.user.gvinfo
@@ -48,11 +48,11 @@ class giangVienDeThi(viewsets.ModelViewSet):
 
 class viewPhongThi(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly)
-    serializer_class = thamGiaPhongThi
+    serializer_class = svThamGiaPhongThi
 
     def get_queryset(self):
-        sinhvien = self.request.user.stinfo
-        return DiemThi.objects.filter(sinhVien=sinhvien)
+        user = self.request.user
+        return DiemThi.objects.filter(sinhVien__user=user)
 
 
 class viewListPhongThi(viewsets.ModelViewSet):
@@ -60,8 +60,27 @@ class viewListPhongThi(viewsets.ModelViewSet):
     serializer_class = getListPhongThi
 
     def get_queryset(self):
-        sinhvien = self.request.user.stinfo
-        return PhongThi.objects.filter(diemthi__sinhVien=sinhvien)
+        user = self.request.user
+        return PhongThi.objects.filter(diemthi__sinhVien__user=user)
+
+
+class svViewGetDeThi(viewsets.ModelViewSet):
+    permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly, )
+    serializer_class = svGetDeThi
+
+    def get_queryset(self):
+        if "idPhongThi" in self.request.data:
+            return DeThi.objects.filter(phongthi__id=self.request.data['idPhongThi'])
+        else:
+            return DeThi.objects.none()
+
+
+class viewGetKeyDeThi(viewsets.ModelViewSet):
+    permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly, )
+    serializer_class = svGetKeyDeThi
+
+    def get_queryset(self):
+        return DeThi.objects.all()
 
 
 class svCTDT(viewsets.ModelViewSet):
@@ -80,5 +99,5 @@ class gvCTDT(viewsets.ModelViewSet):
     permission_classes = (isGiangVienAndOwner, )
 
     def get_queryset(self):
-        giangvien = self.request.user.gvinfo
-        return ChiTietDeThi.objects.filter(deThi__createdBy=giangvien)
+        user = self.request.user
+        return ChiTietDeThi.objects.filter(deThi__createdBy__user=user)

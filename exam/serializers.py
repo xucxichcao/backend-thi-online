@@ -3,19 +3,25 @@ from rest_framework import serializers, permissions
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
 
 
-class themDeThi(serializers.ModelSerializer):
+class gvThemDeThi(serializers.ModelSerializer):
     class Meta:
         model = DeThi
         fields = ('soLuongCauHoi', 'file')
 
 
-class getKeyDeThi(serializers.ModelSerializer):
+class svGetKeyDeThi(serializers.ModelSerializer):
     class Meta:
         model = DeThi
         fields = ('key')
 
 
-class thamGiaPhongThi(serializers.ModelSerializer):
+class svGetDeThi(serializers.ModelSerializer):
+    class Meta:
+        model = DeThi
+        fields = ('id', 'soLuongCauHoi')
+
+
+class svThamGiaPhongThi(serializers.ModelSerializer):
     class Meta:
         model = DiemThi
         fields = ('phongThi', 'sinhVien', 'diem')
