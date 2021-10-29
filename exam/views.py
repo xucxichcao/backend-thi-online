@@ -2,7 +2,7 @@ from django.http import request
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
-from .serializers import svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, getListPhongThi, svGetDeThi, gvThemDeThi, svThamGiaPhongThi
+from .serializers import svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi, svThamGiaPhongThi
 
 
 # Permission
@@ -33,7 +33,7 @@ class isGiangVienAndOwner(permissions.BasePermission):
 # Create your views here.
 
 
-class giangVienDeThi(viewsets.ModelViewSet):
+class gvThemDeThi(viewsets.ModelViewSet):
     permission_classes = (isGiangVien, permissions.IsAuthenticated, )
     serializer_class = gvThemDeThi
 
@@ -55,9 +55,9 @@ class viewPhongThi(viewsets.ModelViewSet):
         return DiemThi.objects.filter(sinhVien__user=user)
 
 
-class viewListPhongThi(viewsets.ModelViewSet):
+class svViewListPhongThi(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly)
-    serializer_class = getListPhongThi
+    serializer_class = svGetListPhongThi
 
     def get_queryset(self):
         user = self.request.user
@@ -75,7 +75,7 @@ class svViewGetDeThi(viewsets.ModelViewSet):
             return DeThi.objects.none()
 
 
-class viewGetKeyDeThi(viewsets.ModelViewSet):
+class svViewGetKeyDeThi(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly, )
     serializer_class = svGetKeyDeThi
 

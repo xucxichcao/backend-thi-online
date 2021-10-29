@@ -27,7 +27,7 @@ class svThamGiaPhongThi(serializers.ModelSerializer):
         fields = ('phongThi', 'sinhVien', 'diem')
 
 
-class getListPhongThi(serializers.ModelSerializer):
+class svGetListPhongThi(serializers.ModelSerializer):
     class Meta:
         model = PhongThi
         fields = ('tenPhongThi', 'siSo', 'giangVien',
