@@ -23,7 +23,7 @@ class svGetDeThi(serializers.ModelSerializer):
 class svGetListPhongThi(serializers.ModelSerializer):
     class Meta:
         model = PhongThi
-        fields = ('tenPhongThi', 'siSo', 'giangVien',
+        fields = ('id', 'tenPhongThi', 'siSo', 'giangVien',
                   'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi')
 
 
@@ -31,6 +31,18 @@ class svGetChiTietDeThi(serializers.ModelSerializer):
     class Meta:
         model = ChiTietDeThi
         fields = ('questionID', 'noiDung')
+
+
+class svLamBaiThi(serializers.ModelSerializer):
+    class Meta:
+        model = DiemThi
+        fields = ('phongThi', 'baiLam')
+
+
+class svGetDiem(serializers.ModelSerializer):
+    class Meta:
+        model = DiemThi
+        fields = ('phongThi', 'diem')
 
 
 class gvGetChiTietDeThi(serializers.ModelSerializer):

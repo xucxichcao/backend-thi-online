@@ -1,8 +1,9 @@
 import datetime
 from django.shortcuts import render
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
+from rest_framework.response import Response
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
-from .serializers import gvPhongThi, svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi
+from .serializers import gvPhongThi, svGetDiem, svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi, svLamBaiThi
 
 
 # Permission
@@ -71,8 +72,49 @@ class svCTDT(viewsets.ModelViewSet):
             return ChiTietDeThi.objects.none()
 
 
+class svViewDiem(viewsets.ModelViewSet):
+    serializer_class = svGetDiem
+    permission_classes = (isSinhVienAndReadOnly, )
+
+    def get_queryset(self):
+        if "phongThiID" in self.request.data:
+            user = self.request.user
+            return DiemThi.objects.filter(sinhVien__user=user, phongThi__id=self.request.data['phongThiID'])
+        else:
+            return DiemThi.objects.none()
+
+
+class svViewLamBai(viewsets.ModelViewSet):
+    serializer_class = svLamBaiThi
+    permission_classes = (isSinhVien,)
+
+    def list(self, request, *args, **kwargs):
+        response = {'message': 'Only POST method is allowed'}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def retrieve(self, request, *args, **kwargs):
+        response = {'message': 'Only POST method is allowed'}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def destroy(self, request, *args, **kwargs):
+        response = {'message': 'Only POST method is allowed'}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        response = {'message': 'Only POST method is allowed'}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def partial_update(self, request, *args, **kwargs):
+        response = {'message': 'Only POST method is allowed'}
+        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def perform_create(self, serializer):
+        req = serializer.context['request']
+        serializer.save(sinhVien=req.user.svinfo)
+
+
 class gvViewPhongThi(viewsets.ModelViewSet):
-    permission_classes = (isGiangVien, permissions.IsAuthenticated, )
+    permission_classes = (isGiangVienAndOwner, permissions.IsAuthenticated, )
     serializer_class = gvPhongThi
 
     def get_queryset(self):
@@ -80,7 +122,7 @@ class gvViewPhongThi(viewsets.ModelViewSet):
 
 
 class gvThemDeThi(viewsets.ModelViewSet):
-    permission_classes = (isGiangVien, permissions.IsAuthenticated, )
+    permission_classes = (isGiangVienAndOwner, permissions.IsAuthenticated, )
     serializer_class = gvThemDeThi
 
     def get_queryset(self):
