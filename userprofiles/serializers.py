@@ -8,18 +8,23 @@ from .models import GiangVien, SinhVien, Truong
 class SinhVienSerializer(serializers.ModelSerializer):
     class Meta:
         model = SinhVien
-        fields = ['full_name', 'sex', 'cid', 'sid',
-                  'phone', 'school', 'date_of_birth']
+        fields = ('full_name', 'sex', 'cid', 'sid',
+                  'phone', 'school', 'date_of_birth')
+        read_only_fields = ('full_name', 'sex', 'cid',
+                            'sid', 'school', 'date_of_birth')
 
 
 class GiangVienSerializer(serializers.ModelSerializer):
     class Meta:
         model = GiangVien
-        fields = ['full_name', 'sex', 'cid', 'sid',
-                  'phone', 'school', 'date_of_birth']
+        fields = ('full_name', 'sex', 'cid', 'sid',
+                  'phone', 'school', 'date_of_birth')
+        read_only_fields = ('full_name', 'sex', 'cid',
+                            'sid', 'school', 'date_of_birth')
 
 
 class TruongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Truong
-        fields = ['school_name', 'phone']
+        fields = ('school_name', 'phone')
+        read_only_fields = ('school_name', 'phone')

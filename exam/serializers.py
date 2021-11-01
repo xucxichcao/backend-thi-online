@@ -2,10 +2,11 @@ from rest_framework import serializers
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
 
 
-class gvThemDeThi(serializers.ModelSerializer):
+class svGetListPhongThi(serializers.ModelSerializer):
     class Meta:
-        model = DeThi
-        fields = ('soLuongCauHoi', 'file')
+        model = PhongThi
+        fields = ('id', 'tenPhongThi', 'siSo', 'giangVien',
+                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi')
 
 
 class svGetKeyDeThi(serializers.ModelSerializer):
@@ -20,11 +21,10 @@ class svGetDeThi(serializers.ModelSerializer):
         fields = ('id', 'soLuongCauHoi')
 
 
-class svGetListPhongThi(serializers.ModelSerializer):
+class svGetIDThamGia(serializers.ModelSerializer):
     class Meta:
-        model = PhongThi
-        fields = ('id', 'tenPhongThi', 'siSo', 'giangVien',
-                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi')
+        model = DiemThi
+        fields = ('id')
 
 
 class svGetChiTietDeThi(serializers.ModelSerializer):
@@ -43,6 +43,12 @@ class svGetDiem(serializers.ModelSerializer):
     class Meta:
         model = DiemThi
         fields = ('phongThi', 'diem')
+
+
+class gvThemDeThi(serializers.ModelSerializer):
+    class Meta:
+        model = DeThi
+        fields = ('soLuongCauHoi', 'file', 'createdBy')
 
 
 class gvGetChiTietDeThi(serializers.ModelSerializer):
