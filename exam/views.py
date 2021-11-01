@@ -1,6 +1,6 @@
 import datetime
 from django.shortcuts import render
-from rest_framework import viewsets, permissions, status
+from rest_framework import mixins, viewsets, permissions, status
 from rest_framework.response import Response
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
 from .serializers import gvPhongThi, svGetDiem, svGetIDThamGia, svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi, svLamBaiThi
@@ -101,21 +101,10 @@ class svViewDiem(viewsets.ModelViewSet):
             return DiemThi.objects.none()
 
 
-class svViewLamBai(viewsets.ModelViewSet):
+class svViewLamBai(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = svLamBaiThi
     permission_classes = (isSinhVien,)
-
-    def list(self, request, *args, **kwargs):
-        response = {'message': 'Only PUT method is allowed'}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def retrieve(self, request, *args, **kwargs):
-        response = {'message': 'Only PUT method is allowed'}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    def destroy(self, request, *args, **kwargs):
-        response = {'message': 'Only PUT method is allowed'}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    queryset = DiemThi.objects.none()
 
     def update(self, request, *args, **kwargs):
         if "idPhongThi" in self.request.data:
@@ -128,13 +117,27 @@ class svViewLamBai(viewsets.ModelViewSet):
                 return super().update(request, *args, **kwargs)
         return Response({'message': 'Không trong thời gian làm bài'}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
-    def partial_update(self, request, *args, **kwargs):
-        response = {'message': 'Only PUT method is allowed'}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    def put(self, request, *args, **kwargs):
+        user = self.request.user
+        if "phongThi" in self.request.data:
+            instance = DiemThi.objects.get(
+                phongThi__id=self.request.data['phongThi'], sinhVien__user=user)
+            pt = instance.phongThi
+            time = pt.thoiGianThi
+            timeplus = pt.thoiGianLamBai
+            if datetime.datetime.now() > time and datetime.datetime.now() < (time + datetime.timedelta(minutes=timeplus)):
+                serializer = self.get_serializer(
+                    instance, data=request.data, partial=False)
+                serializer.is_valid(raise_exception=True)
+                self.perform_update(serializer)
+                return Response(serializer.data)
+            else:
+                return Response({"message": "Không trong thời gian làm bài"}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({"message": "Phòng thi không tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def create(self, request, *args, **kwargs):
-        response = {'message': 'Only PUT method is allowed'}
-        return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    def perform_update(self, serializer):
+        serializer.save()
 
 
 class gvViewPhongThi(viewsets.ModelViewSet):
