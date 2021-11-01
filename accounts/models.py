@@ -13,9 +13,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     admin = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
-    school = models.BooleanField(default=False)
+    school = models.BooleanField(default=True)
     teacher = models.BooleanField(default=False)
-    student = models.BooleanField(default=True)
+    student = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []

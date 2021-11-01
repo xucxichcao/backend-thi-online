@@ -6,6 +6,9 @@ from .models import GiangVien, SinhVien, Truong
 
 
 class SinhVienSerializer(serializers.ModelSerializer):
+    school = serializers.SlugRelatedField(
+        slug_field="school_name", read_only=True)
+
     class Meta:
         model = SinhVien
         fields = ('full_name', 'sex', 'cid', 'sid',
@@ -15,6 +18,9 @@ class SinhVienSerializer(serializers.ModelSerializer):
 
 
 class GiangVienSerializer(serializers.ModelSerializer):
+    school = serializers.SlugRelatedField(
+        slug_field="school_name", read_only=True)
+
     class Meta:
         model = GiangVien
         fields = ('full_name', 'sex', 'cid', 'sid',
@@ -27,4 +33,3 @@ class TruongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Truong
         fields = ('school_name', 'phone')
-        read_only_fields = ('school_name', 'phone')

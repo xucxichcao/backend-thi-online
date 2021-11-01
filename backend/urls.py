@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from accounts.urls import account_urlpatterns
 from exam.urls import exam_urlpatterns
-
+from userprofiles.urls import profile_urlpatterns
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('dj_rest_auth.urls')),
@@ -27,3 +27,4 @@ urlpatterns = [
 ]
 urlpatterns += account_urlpatterns
 urlpatterns += exam_urlpatterns
+urlpatterns += profile_urlpatterns
