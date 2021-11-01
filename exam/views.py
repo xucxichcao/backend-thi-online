@@ -35,8 +35,14 @@ class isGiangVienAndOwner(permissions.BasePermission):
         return obj.deThi.createdBy.user == request.user
 
 
+class isOwnedDeThi(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.createdBy.user == request.user
+
 # Create your views here.
-class svViewListPhongThi(viewsets.ModelViewSet):
+
+
+class svViewListPhongThi(viewsets.GenericViewSet, mixins.ListModelMixin):
     permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly)
     serializer_class = svGetListPhongThi
 
@@ -45,7 +51,7 @@ class svViewListPhongThi(viewsets.ModelViewSet):
         return PhongThi.objects.filter(diemthi__sinhVien__user=user)
 
 
-class svViewGetDeThi(viewsets.ModelViewSet):
+class svViewGetDeThi(viewsets.GenericViewSet, mixins.ListModelMixin):
     permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly, )
     serializer_class = svGetDeThi
 
@@ -56,7 +62,7 @@ class svViewGetDeThi(viewsets.ModelViewSet):
             return DeThi.objects.none()
 
 
-class svViewGetKeyDeThi(viewsets.ModelViewSet):
+class svViewGetKeyDeThi(viewsets.GenericViewSet, mixins.ListModelMixin):
     permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly, )
     serializer_class = svGetKeyDeThi
 
@@ -67,7 +73,7 @@ class svViewGetKeyDeThi(viewsets.ModelViewSet):
             return DeThi.objects.none()
 
 
-class svCTDT(viewsets.ModelViewSet):
+class svCTDT(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = svGetChiTietDeThi
     permission_classes = (isSinhVienAndReadOnly, )
 
@@ -78,7 +84,7 @@ class svCTDT(viewsets.ModelViewSet):
             return ChiTietDeThi.objects.none()
 
 
-class svViewDiem(viewsets.ModelViewSet):
+class svViewDiem(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = svGetDiem
     permission_classes = (isSinhVienAndReadOnly, )
 
@@ -138,7 +144,8 @@ class gvViewPhongThi(viewsets.ModelViewSet):
 
 
 class gvThemDeThi(viewsets.ModelViewSet):
-    permission_classes = (isGiangVienAndOwner, permissions.IsAuthenticated, )
+    permission_classes = (isGiangVien, isOwnedDeThi,
+                          permissions.IsAuthenticated, )
     serializer_class = gvThemDeThi
 
     def get_queryset(self):
