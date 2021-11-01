@@ -56,17 +56,6 @@ class svViewGetDeThi(viewsets.ModelViewSet):
             return DeThi.objects.none()
 
 
-class svViewGetIDThamGia(viewsets.ModelViewSet):
-    permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly, )
-    serializer_class = svGetIDThamGia
-
-    def get_queryset(self):
-        if "idPhongThi" in self.request.data:
-            return DiemThi.objects.filter(phongThi__id=self.request.data['idPhongThi'], sinhVien__user=self.request.user)
-        else:
-            return DiemThi.objects.none()
-
-
 class svViewGetKeyDeThi(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, isSinhVienAndReadOnly, )
     serializer_class = svGetKeyDeThi

@@ -21,12 +21,6 @@ class svGetDeThi(serializers.ModelSerializer):
         fields = ('id', 'soLuongCauHoi')
 
 
-class svGetIDThamGia(serializers.ModelSerializer):
-    class Meta:
-        model = DiemThi
-        fields = ('id')
-
-
 class svGetChiTietDeThi(serializers.ModelSerializer):
     class Meta:
         model = ChiTietDeThi
