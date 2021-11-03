@@ -6,10 +6,10 @@ from userprofiles.models import GiangVien, SinhVien
 
 
 def _createHash():
-    """This function generate 10 character long hash"""
+    """This function generate 8 character long hash"""
     hash = hashlib.sha1()
-    hash.update(str(time.time()))
-    return hash.hexdigest()[:-8]
+    hash.update(str(time.time()).encode('utf-8'))
+    return hash.hexdigest()[:8]
 
 
 class DeThi(models.Model):
@@ -19,12 +19,18 @@ class DeThi(models.Model):
     createdBy = models.ForeignKey(
         GiangVien, on_delete=models.CASCADE)
 
+    # def __str__(self):
+    #     return str(self.phongthi)
+
 
 class ChiTietDeThi(models.Model):
     deThi = models.ForeignKey(DeThi, on_delete=models.CASCADE)
     questionID = models.PositiveSmallIntegerField()
     noiDung = models.TextField()
     dapAn = models.PositiveSmallIntegerField()
+
+    # def __str__(self):
+    # return str(self.deThi) + " - câu " + str(self.questionID+1)
 
 
 class PhongThi(models.Model):
@@ -33,11 +39,14 @@ class PhongThi(models.Model):
     giangVien = models.ForeignKey(GiangVien, on_delete=models.CASCADE)
     danhSach = models.FileField(upload_to="danhSachPhongThi/")
     deThi = models.OneToOneField(
-        DeThi, related_name='phongthi', on_delete=models.CASCADE, null=True)
+        DeThi, related_name='phongthi', on_delete=models.CASCADE, null=True, blank=True)
     thoiGianLamBai = models.PositiveSmallIntegerField()
     thoiGianThi = models.DateTimeField()
     namHoc = models.CharField(max_length=11)
     hocKi = models.PositiveIntegerField()
+
+    # def __str__(self):
+    #     return str(self.tenPhongThi) + " - " + str(self.giangVien)
 
 
 class DiemThi(models.Model):

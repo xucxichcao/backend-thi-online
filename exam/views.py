@@ -3,7 +3,7 @@ from django.shortcuts import render
 from rest_framework import mixins, viewsets, permissions, status
 from rest_framework.response import Response
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
-from .serializers import gvPhongThi, svGetDiem, svGetIDThamGia, svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi, svLamBaiThi
+from .serializers import gvPhongThi, svGetDiem, svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, gvThemDeThi, svLamBaiThi
 
 
 # Permission
@@ -38,6 +38,11 @@ class isGiangVienAndOwner(permissions.BasePermission):
 class isOwnedDeThi(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.createdBy.user == request.user
+
+
+class isOwnedPhongThi(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.giangVien.user == request.user
 
 # Create your views here.
 
@@ -136,7 +141,7 @@ class svViewLamBai(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class gvViewPhongThi(viewsets.ModelViewSet):
-    permission_classes = (isGiangVienAndOwner, permissions.IsAuthenticated, )
+    permission_classes = (isGiangVien, permissions.IsAuthenticated, )
     serializer_class = gvPhongThi
 
     def get_queryset(self):
@@ -162,5 +167,7 @@ class gvCTDT(viewsets.ModelViewSet):
     permission_classes = (isGiangVienAndOwner, )
 
     def get_queryset(self):
-        user = self.request.user
-        return ChiTietDeThi.objects.filter(deThi__createdBy__user=user)
+        if 'phongThi' in self.request.data:
+            user = self.request.user
+            return ChiTietDeThi.objects.filter(deThi__createdBy__user=user, deThi__phongthi__id=self.request.data['phongThi'])
+        return ChiTietDeThi.objects.none()

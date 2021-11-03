@@ -10,6 +10,8 @@ User = settings.AUTH_USER_MODEL
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_('email address'), unique=True)
+    avatar = models.ImageField(
+        upload_to="avatar/", default='avatar/default.png')
     is_active = models.BooleanField(default=True)
     admin = models.BooleanField(default=False)
     staff = models.BooleanField(default=False)
