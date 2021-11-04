@@ -37,10 +37,10 @@ class AccountBulkCreateSerializer(serializers.ModelSerializer):
             for row in csvf:
                 try:
                     user = User(email=row[1], student=True, school=False)
-                    user.password = make_password(row[3])
+                    user.password = make_password(row[2])
                     user.save()
                     newSinhVien = SinhVien(
-                        user=user, full_name=row[2], sex=row[4], cid=row[5], phone=row[6], date_of_birth=datetime.strptime(row[7], '%d-%m-%Y'), school=school)
+                        user=user, sid=row[0], full_name=row[3], sex=row[4], cid=row[5], phone=row[6], date_of_birth=datetime.strptime(row[7], '%d-%m-%Y'), school=school)
                     newSinhVien.save()
                     newEmail = EmailAddress(
                         user=user, email=row[1], verified=True)
@@ -55,10 +55,10 @@ class AccountBulkCreateSerializer(serializers.ModelSerializer):
             for row in csvf:
                 try:
                     user = User(email=row[1], school=False, teacher=True)
-                    user.password = make_password(row[3])
+                    user.password = make_password(row[2])
                     user.save()
                     newGiangVien = GiangVien(
-                        user=user, full_name=row[2], sex=row[4], cid=row[5], phone=row[6], date_of_birth=datetime.strptime(row[7], '%d-%m-%Y'), school=school)
+                        user=user, sid=row[0], full_name=row[3], sex=row[4], cid=row[5], phone=row[6], date_of_birth=datetime.strptime(row[7], '%d-%m-%Y'), school=school)
                     newGiangVien.save()
                     newEmail = EmailAddress(
                         user=user, email=row[1], verified=True)
