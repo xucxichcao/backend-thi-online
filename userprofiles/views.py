@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets, permissions, status, mixins
 from rest_framework.response import Response
 from .models import Truong, SinhVien, GiangVien
-from .serializers import TruongSerializer, SinhVienSerializer, GiangVienSerializer
+from .serializers import TruongCreateProfileSerializer, TruongSerializer, SinhVienSerializer, GiangVienSerializer
 
 
 # Permissions
@@ -28,6 +28,11 @@ class isTruongAndOwned(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return obj.user == request.user
+
+
+class isTruong(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.school
 
 # Create your views here.
 
@@ -81,3 +86,12 @@ class viewProfile(mixins.ListModelMixin, viewsets.GenericViewSet, mixins.UpdateM
 
     def perform_update(self, serializer):
         serializer.save()
+
+
+class TruongViewSet(viewsets.GenericViewSet, mixins.CreateModelMixin):
+    serializer_class = TruongCreateProfileSerializer
+    permission_classes = (isTruong,)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        serializer.save(user=user)

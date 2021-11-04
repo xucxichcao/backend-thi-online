@@ -38,3 +38,11 @@ class TruongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Truong
         fields = ('avatar', 'school_name', 'phone')
+
+
+class TruongCreateProfileSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
+    class Meta:
+        model = Truong
+        fields = ('user', 'school_name', 'phone')
