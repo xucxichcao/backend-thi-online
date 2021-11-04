@@ -1,4 +1,5 @@
 import datetime
+from django.utils import timezone
 from django.shortcuts import render
 from rest_framework import mixins, viewsets, permissions, status
 from rest_framework.response import Response
@@ -94,9 +95,9 @@ class svViewDiem(viewsets.GenericViewSet, mixins.ListModelMixin):
     permission_classes = (isSinhVienAndReadOnly, )
 
     def get_queryset(self):
-        if "phongThiID" in self.request.data:
+        if "idPhongThi" in self.request.data:
             user = self.request.user
-            return DiemThi.objects.filter(sinhVien__user=user, phongThi__id=self.request.data['phongThiID'])
+            return DiemThi.objects.filter(sinhVien__user=user, phongThi__id=self.request.data['idPhongThi'])
         else:
             return DiemThi.objects.none()
 
@@ -106,33 +107,26 @@ class svViewLamBai(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (isSinhVien,)
     queryset = DiemThi.objects.none()
 
-    def update(self, request, *args, **kwargs):
-        if "idPhongThi" in self.request.data:
-            dt = DiemThi.objects.get(
-                phongThi__id=self.request.data['idPhongThi'], sinhVien__user=self.request.user)
-            pt = dt.phongThi
-            time = pt.thoiGianThi
-            timeplus = pt.thoiGianLamBai
-            if datetime.datetime.now() > time and datetime.datetime.now() < (time + datetime.timedelta(minutes=timeplus)):
-                return super().update(request, *args, **kwargs)
-        return Response({'message': 'Không trong thời gian làm bài'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-
     def put(self, request, *args, **kwargs):
         user = self.request.user
         if "phongThi" in self.request.data:
-            instance = DiemThi.objects.get(
-                phongThi__id=self.request.data['phongThi'], sinhVien__user=user)
-            pt = instance.phongThi
-            time = pt.thoiGianThi
-            timeplus = pt.thoiGianLamBai
-            if datetime.datetime.now() > time and datetime.datetime.now() < (time + datetime.timedelta(minutes=timeplus)):
-                serializer = self.get_serializer(
-                    instance, data=request.data, partial=False)
-                serializer.is_valid(raise_exception=True)
-                self.perform_update(serializer)
-                return Response(serializer.data)
+            if DiemThi.objects.filter(sinhVien__user=user, phongThi__id=self.request.data['phongThi']).exists():
+                instance = DiemThi.objects.get(
+                    phongThi__id=self.request.data['phongThi'], sinhVien__user=user)
+                pt = instance.phongThi
+                time = pt.thoiGianThi
+                timeplus = pt.thoiGianLamBai
+                now = timezone.now()
+                if now > time and now < (time + datetime.timedelta(minutes=timeplus)):
+                    serializer = self.get_serializer(
+                        instance, data=request.data, partial=False)
+                    serializer.is_valid(raise_exception=True)
+                    self.perform_update(serializer)
+                    return Response(serializer.data)
+                else:
+                    return Response({"message": "Không trong thời gian làm bài"}, status=status.HTTP_403_FORBIDDEN)
             else:
-                return Response({"message": "Không trong thời gian làm bài"}, status=status.HTTP_403_FORBIDDEN)
+                return Response({'message': 'Bạn không trong phòng thi này'}, status=status.HTTP_403_FORBIDDEN)
         else:
             return Response({"message": "Phòng thi không tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
 

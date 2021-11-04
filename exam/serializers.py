@@ -3,16 +3,23 @@ from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
 
 
 class svGetListPhongThi(serializers.ModelSerializer):
+    diem = serializers.SerializerMethodField()
+
+    def get_diem(self, obj):
+        user = self.context.get('request').user
+        pt = obj
+        return DiemThi.objects.get(sinhVien__user=user, phongThi=pt).diem
+
     class Meta:
         model = PhongThi
         fields = ('id', 'tenPhongThi', 'siSo', 'giangVien',
-                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi')
+                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi', 'diem')
 
 
 class svGetKeyDeThi(serializers.ModelSerializer):
     class Meta:
         model = DeThi
-        fields = ('key')
+        fields = ('key',)
 
 
 class svGetDeThi(serializers.ModelSerializer):
@@ -54,5 +61,5 @@ class gvGetChiTietDeThi(serializers.ModelSerializer):
 class gvPhongThi(serializers.ModelSerializer):
     class Meta:
         model = PhongThi
-        fields = ('tenPhongThi', 'siSo', 'giangVien', 'danhSach', 'deThi',
+        fields = ('id', 'tenPhongThi', 'siSo', 'giangVien', 'danhSach', 'deThi',
                   'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi')
