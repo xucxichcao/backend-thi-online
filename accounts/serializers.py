@@ -19,6 +19,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AccountBulkCreateSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(
+        default=serializers.CurrentUserDefault(),
+    )
+
     class Meta:
         model = accountBulkCreate
         fields = ('user', 'csv_file', 'type')

@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
-from .views import gvThemDeThi, gvCTDT, gvViewPhongThi, svCTDT, svViewGetDeThi, svViewGetKeyDeThi, svViewLamBai, svViewListPhongThi
+from .views import gvThemDeThi, gvCTDT, gvViewAllDiem, gvViewPhongThi, schoolViewAllDiem, schoolViewPhongThi, svCTDT, svViewGetDeThi, svViewGetKeyDeThi, svViewLamBai, svViewListPhongThi
 
 router = DefaultRouter()
 router.register("sv/phong-thi", svViewListPhongThi, basename="svViewPhongThi")
@@ -14,4 +14,9 @@ router.register("gv/phong-thi", gvViewPhongThi,
                 basename="Giang Vien Phong Thi")
 router.register("gv/de-thi", gvThemDeThi, basename="gvThemDeThi")
 router.register("gv/ctdt", gvCTDT, basename="GiangViengetCTDT")
+router.register("gv/diem-thi", gvViewAllDiem,
+                basename="Giảng viên xem điểm 1 phòng thi")
+router.register("school/phong-thi", schoolViewPhongThi, basename='Trường xem danh sách phòng thi')
+router.register("school/diem-thi", schoolViewAllDiem,
+                basename="Trường xem điểm phòng thi")
 exam_urlpatterns = [url("api/", include(router.urls))]

@@ -8,14 +8,15 @@ from accounts.models import CustomUser
 
 class SinhVienSerializer(serializers.ModelSerializer):
     avatar = serializers.ImageField(source="user.avatar")
+    email = serializers.EmailField(source="user.email")
     school = serializers.SlugRelatedField(
         slug_field="school_name", read_only=True)
 
     class Meta:
         model = SinhVien
-        fields = ('avatar', 'full_name', 'sex', 'cid', 'sid',
+        fields = ('email', 'avatar', 'full_name', 'sex', 'cid', 'sid',
                   'phone', 'school', 'date_of_birth')
-        read_only_fields = ('full_name', 'sex', 'cid',
+        read_only_fields = ('email', 'full_name', 'sex', 'cid',
                             'sid', 'school', 'date_of_birth')
 
 
@@ -23,21 +24,24 @@ class GiangVienSerializer(serializers.ModelSerializer):
     school = serializers.SlugRelatedField(
         slug_field="school_name", read_only=True)
     avatar = serializers.ImageField(source="user.avatar")
+    email = serializers.EmailField(source="user.email")
 
     class Meta:
         model = GiangVien
-        fields = ('avatar', 'full_name', 'sex', 'cid', 'sid',
+        fields = ('email', 'avatar', 'full_name', 'sex', 'cid', 'sid',
                   'phone', 'school', 'date_of_birth')
-        read_only_fields = ('full_name', 'sex', 'cid',
+        read_only_fields = ('email', 'full_name', 'sex', 'cid',
                             'sid', 'school', 'date_of_birth')
 
 
 class TruongSerializer(serializers.ModelSerializer):
     avatar = serializers.ImageField(source="user.avatar")
+    email = serializers.EmailField(source="user.email")
 
     class Meta:
         model = Truong
-        fields = ('avatar', 'school_name', 'phone')
+        fields = ('email', 'avatar', 'school_name', 'phone')
+        read_only_fields = ('email',)
 
 
 class TruongCreateProfileSerializer(serializers.ModelSerializer):

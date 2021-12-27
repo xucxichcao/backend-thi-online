@@ -24,7 +24,7 @@ def taoDeThi(sender, instance, created, **kwargs):
             cauhoi['cauhoi'] = row[1]
             for i in range(slda):
                 cauhoi['luachon'].append({"id": i, "noidung": row[2+i]})
-            dapan = slda+2
+            dapan = int(row[slda+2])
             newCTDT = ChiTietDeThi(questionID=questionID,
                                    deThi=instance, noiDung=json.dumps(cauhoi), dapAn=dapan)
             newCTDT.save()

@@ -1,9 +1,12 @@
 from rest_framework import serializers
+
+from userprofiles.models import GiangVien
 from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
 
 
 class svGetListPhongThi(serializers.ModelSerializer):
     diem = serializers.SerializerMethodField()
+    giangVien_name = serializers.ReadOnlyField(source='giangVien.full_name')
 
     def get_diem(self, obj):
         user = self.context.get('request').user
@@ -13,7 +16,7 @@ class svGetListPhongThi(serializers.ModelSerializer):
     class Meta:
         model = PhongThi
         fields = ('id', 'tenPhongThi', 'siSo', 'giangVien',
-                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi', 'diem')
+                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi', 'diem', 'giangVien_name')
 
 
 class svGetKeyDeThi(serializers.ModelSerializer):
@@ -50,6 +53,7 @@ class gvThemDeThi(serializers.ModelSerializer):
     class Meta:
         model = DeThi
         fields = ('soLuongCauHoi', 'file', 'createdBy')
+        read_only_fields = ('createdBy', )
 
 
 class gvGetChiTietDeThi(serializers.ModelSerializer):
@@ -59,7 +63,27 @@ class gvGetChiTietDeThi(serializers.ModelSerializer):
 
 
 class gvPhongThi(serializers.ModelSerializer):
+    giangVien_name = serializers.ReadOnlyField(source='giangVien.full_name')
+
     class Meta:
         model = PhongThi
         fields = ('id', 'tenPhongThi', 'siSo', 'giangVien', 'danhSach', 'deThi',
-                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi')
+                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi', 'giangVien_name')
+        read_only_fields = ('giangVien',)
+
+
+class DiemAll(serializers.ModelSerializer):
+    sinhVien_name = serializers.ReadOnlyField(source="sinhVien.full_name")
+
+    class Meta:
+        model = DiemThi
+        fields = ('sinhVien', 'diem', 'sinhVien_name')
+
+
+class schoolPhongThi(serializers.ModelSerializer):
+    giangVien_name = serializers.ReadOnlyField(source='giangVien.full_name')
+
+    class Meta:
+        model = PhongThi
+        fields = ('id', 'tenPhongThi', 'siSo', 'giangVien', 'danhSach', 'deThi',
+                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi', 'giangVien_name')
