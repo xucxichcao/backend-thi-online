@@ -28,7 +28,13 @@ class svGetKeyDeThi(serializers.ModelSerializer):
 class svGetDeThi(serializers.ModelSerializer):
     class Meta:
         model = DeThi
-        fields = ('id', 'soLuongCauHoi')
+        fields = ('id', 'soLuongCauHoi', 'kieuThi')
+
+
+class svGetDeThiTuLuan(serializers.ModelSerializer):
+    class Meta:
+        model = DeThi
+        fields = ('id', 'kieuThi', 'file')
 
 
 class svGetChiTietDeThi(serializers.ModelSerializer):
@@ -43,17 +49,30 @@ class svLamBaiThi(serializers.ModelSerializer):
         fields = ('phongThi', 'baiLam')
 
 
+class svLamBaiThiTuLuan(serializers.ModelSerializer):
+    class Meta:
+        model = DiemThi
+        fields = ('phongThi', 'baiLamTuLuan')
+
+
 class svGetDiem(serializers.ModelSerializer):
     class Meta:
         model = DiemThi
         fields = ('phongThi', 'diem')
 
 
-class gvThemDeThi(serializers.ModelSerializer):
+class gvThemDeThiSer(serializers.ModelSerializer):
     class Meta:
         model = DeThi
-        fields = ('soLuongCauHoi', 'file', 'createdBy')
-        read_only_fields = ('createdBy', )
+        fields = ('soLuongCauHoi', 'file', 'createdBy', 'kieuThi')
+        read_only_fields = ('createdBy',)
+
+
+class gvGetDeTuLuan(serializers.ModelSerializer):
+    class Meta:
+        model = DeThi
+        fields = ('file',)
+        read_only_fields = ('file',)
 
 
 class gvGetChiTietDeThi(serializers.ModelSerializer):

@@ -18,6 +18,9 @@ from django.urls import path, include
 from accounts.urls import account_urlpatterns
 from exam.urls import exam_urlpatterns
 from userprofiles.urls import profile_urlpatterns
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('dj_rest_auth.urls')),
@@ -27,3 +30,4 @@ urlpatterns = [
 urlpatterns += account_urlpatterns
 urlpatterns += exam_urlpatterns
 urlpatterns += profile_urlpatterns
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

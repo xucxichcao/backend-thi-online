@@ -12,24 +12,25 @@ User = get_user_model()
 @receiver(post_save, sender=DeThi)
 def taoDeThi(sender, instance, created, **kwargs):
     if created:
-        csv_file = instance.file
-        csvf = csv_file.read().decode('utf-8-sig')
-        csv_data = csv.reader(StringIO(csvf), delimiter=',')
-        cauhoi = {'cauhoi': '', 'luachon': []}
-        dapan = -1
-        questionID = 0
-        for row in csv_data:
-            print(row[0])
-            slda = int(row[0])
-            cauhoi['cauhoi'] = row[1]
-            for i in range(slda):
-                cauhoi['luachon'].append({"id": i, "noidung": row[2+i]})
-            dapan = int(row[slda+2])
-            newCTDT = ChiTietDeThi(questionID=questionID,
-                                   deThi=instance, noiDung=json.dumps(cauhoi), dapAn=dapan)
-            newCTDT.save()
-            questionID = questionID+1
+        if instance.kieuThi:
+            csv_file = instance.file
+            csvf = csv_file.read().decode('utf-8-sig')
+            csv_data = csv.reader(StringIO(csvf), delimiter=',')
             cauhoi = {'cauhoi': '', 'luachon': []}
+            dapan = -1
+            questionID = 0
+            for row in csv_data:
+                print(row[0])
+                slda = int(row[0])
+                cauhoi['cauhoi'] = row[1]
+                for i in range(slda):
+                    cauhoi['luachon'].append({"id": i, "noidung": row[2+i]})
+                dapan = int(row[slda+2])
+                newCTDT = ChiTietDeThi(questionID=questionID,
+                                       deThi=instance, noiDung=json.dumps(cauhoi), dapAn=dapan)
+                newCTDT.save()
+                questionID = questionID+1
+                cauhoi = {'cauhoi': '', 'luachon': []}
 
         phongThi = PhongThi.objects.get(pk=instance.id)
         phongThi.deThi = instance

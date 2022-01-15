@@ -12,7 +12,11 @@ def _createHash():
     return hash.hexdigest()[:8]
 
 
+KIEUTHI_CHOICES = ((False, "Tự luận"), (True, "Trắc nghiệm"),)
+
+
 class DeThi(models.Model):
+    kieuThi = models.BooleanField(choices=KIEUTHI_CHOICES, default=True)
     soLuongCauHoi = models.PositiveSmallIntegerField()
     file = models.FileField(upload_to="deThi/")
     key = models.CharField(max_length=8, default=_createHash, unique=True)
@@ -44,7 +48,6 @@ class PhongThi(models.Model):
     thoiGianThi = models.DateTimeField()
     namHoc = models.CharField(max_length=11)
     hocKi = models.PositiveIntegerField()
-
     # def __str__(self):
     #     return str(self.tenPhongThi) + " - " + str(self.giangVien)
 
@@ -55,6 +58,7 @@ class DiemThi(models.Model):
     baiLam = models.TextField(blank=True)
     diem = models.DecimalField(
         decimal_places=2, max_digits=4, null=True, blank=True)
+    baiLamTuLuan = models.FileField(upload_to="baiLamTuLuan/", blank=True)
 
     class Meta:
         constraints = [
