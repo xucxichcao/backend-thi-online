@@ -65,3 +65,7 @@ class DiemThi(models.Model):
             models.UniqueConstraint(
                 fields=['sinhVien', 'phongThi'], name="unique Sv PhongThi")
         ]
+
+class DiemTuLuan(models.Model):
+    phongThi = models.ForeignKey(PhongThi, on_delete=models.CASCADE)
+    fileDiem = models.FileField(upload_to="diemTuLuan/")

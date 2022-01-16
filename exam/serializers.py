@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from userprofiles.models import GiangVien
-from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
+from .models import DeThi, DiemThi, DiemTuLuan, PhongThi, ChiTietDeThi
 
 
 class svGetListPhongThi(serializers.ModelSerializer):
@@ -83,12 +83,32 @@ class gvGetChiTietDeThi(serializers.ModelSerializer):
 
 class gvPhongThi(serializers.ModelSerializer):
     giangVien_name = serializers.ReadOnlyField(source='giangVien.full_name')
+    kieuThi = serializers.ReadOnlyField(source='deThi.kieuThi')
 
     class Meta:
         model = PhongThi
         fields = ('id', 'tenPhongThi', 'siSo', 'giangVien', 'danhSach', 'deThi',
-                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi', 'giangVien_name')
+                  'thoiGianLamBai', 'thoiGianThi', 'namHoc', 'hocKi', 'giangVien_name', 'kieuThi')
         read_only_fields = ('giangVien',)
+
+
+class gvBaiThiTuLuan(serializers.ModelSerializer):
+    sinhVien_name = serializers.ReadOnlyField(source="sinhVien.full_name")
+    sinhVien_sid = serializers.ReadOnlyField(source="sinhVien.sid")
+
+    class Meta:
+        model = DiemThi
+        fields = ('id', 'sinhVien', 'baiLamTuLuan',
+                  'sinhVien_name', 'sinhVien_sid')
+
+
+class gvSerializerUploadTuLuan(serializers.ModelSerializer):
+    class Meta:
+        model = DiemTuLuan
+        fields = ('id', 'fileDiem', 'phongThi')
+
+    def create(self, validated_data):
+        file = validated_data.get('fileDiem')
 
 
 class DiemAll(serializers.ModelSerializer):

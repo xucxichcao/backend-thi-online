@@ -1,18 +1,21 @@
-from functools import partial
 import io
 import datetime
 import json
-from rest_framework.decorators import permission_classes
+import os
+import zipfile
+import csv
+from rest_framework.decorators import api_view, permission_classes
 import unidecode
-from django.http.response import Http404
+from django.http.response import Http404, JsonResponse
 from xlsxwriter.workbook import Workbook
 from accounts.views import IsSchoolAccount
 from django.http import HttpResponse
 from django.utils import timezone
-from rest_framework import mixins, serializers, viewsets, permissions, status, renderers
+from rest_framework import mixins, viewsets, permissions, status, renderers
 from rest_framework.response import Response
-from .models import DeThi, DiemThi, PhongThi, ChiTietDeThi
-from .serializers import DiemAll, gvGetDeTuLuan, gvPhongThi, gvThemDeThiSer, schoolPhongThi, svGetDeThiTuLuan, svGetDiem, svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, svLamBaiThi, svLamBaiThiTuLuan
+from rest_framework.decorators import permission_classes
+from .models import DeThi, DiemThi, DiemTuLuan, PhongThi, ChiTietDeThi
+from .serializers import DiemAll, gvBaiThiTuLuan, gvGetDeTuLuan, gvPhongThi, gvSerializerUploadTuLuan, gvThemDeThiSer, schoolPhongThi, svGetDeThiTuLuan, svGetDiem, svGetKeyDeThi, gvGetChiTietDeThi, svGetChiTietDeThi, svGetListPhongThi, svGetDeThi, svLamBaiThi, svLamBaiThiTuLuan
 
 # Renderers
 
@@ -294,7 +297,8 @@ class gvViewDeTuLuan(viewsets.ModelViewSet):
         return DeThi.objects.none()
 
 
-def download(request):
+@permission_classes((permissions.IsAuthenticated, isGiangVien,))
+def getDanhSachDiemThi(request):
     idPhongThi = request.GET.get('idPhongThi')
     if idPhongThi:
         queryset = DiemThi.objects.filter(phongThi__id=idPhongThi)
@@ -311,7 +315,10 @@ def download(request):
         sheet.write(0, 1, "Điểm số")
         for item in fullDiem:
             sheet.write(row, column, item['sinhVien'])
-            sheet.write(row, column+1, item['diem'])
+            if item['diem']:
+                sheet.write(row, column+1, item['diem'])
+            else:
+                sheet.write(row, column+1, 0)
             row = row + 1
         book.close()
         output.seek(0)
@@ -337,6 +344,105 @@ class gvViewAllDiem(viewsets.GenericViewSet, mixins.ListModelMixin):
             user = self.request.user
             return DiemThi.objects.filter(phongThi__id=idPhongThi, phongThi__giangVien__user=user)
         return DiemThi.objects.none()
+
+
+class gvViewBaiLamTuLuan(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = gvBaiThiTuLuan
+    permission_classes = (permissions.IsAuthenticated, isGiangVien,)
+
+    def get_queryset(self):
+        idPhongThi = self.request.query_params.get('idPhongThi')
+        if idPhongThi:
+            user = self.request.user
+            return DiemThi.objects.filter(phongThi__id=idPhongThi, phongThi__giangVien__user=user)
+        return DiemThi.objects.none()
+
+
+@permission_classes((permissions.IsAuthenticated, isGiangVien,))
+def getDanhSachBaiThiTuLuan(request):
+    idPhongThi = request.GET.get('idPhongThi')
+    if idPhongThi:
+        file = []
+        lsBaiThi = DiemThi.objects.filter(phongThi__id=idPhongThi)
+        for item in lsBaiThi:
+            if item.baiLamTuLuan.name:
+                file.append({"path": item.baiLamTuLuan.path,
+                            "name": item.baiLamTuLuan.name,
+                             "sid": item.sinhVien.sid})
+        tenfile = unidecode.unidecode(
+            PhongThi.objects.get(id=idPhongThi).tenPhongThi)
+        tenfile = tenfile.replace(" ", "")
+        tenfile += ".zip"
+        s = io.BytesIO()
+        with zipfile.ZipFile(s, "w", zipfile.ZIP_DEFLATED) as zipFile:
+            for item in file:
+                filename = os.path.join("uploads", item["name"])
+                zip_path = item["sid"] + ".pdf"
+                zipFile.write(filename, zip_path)
+        response = HttpResponse(
+            s.getvalue(), content_type='application/x-zip-compressed')
+        response['Content-Disposition'] = "attachment; filename=%s" % tenfile
+        return response
+    else:
+        return Http404
+
+
+@permission_classes((permissions.IsAuthenticated, isGiangVien,))
+@api_view(['POST'])
+def uploadDiemThi(request):
+    idPhongThi = request.POST.get('idPhongThi')
+    fileDiem = request.FILES['file']
+    print(idPhongThi)
+    decoded_file = fileDiem.read().decode('utf-8')
+    io_string = io.StringIO(decoded_file)
+    csvf = csv.reader(io_string)
+    for row in csvf:
+        try:
+            mssv = str(row[0])
+            diem = row[1]
+            print(mssv)
+            obj = DiemThi.objects.get(
+                sinhVien__sid=mssv, phongThi__id=idPhongThi)
+            print(obj)
+            obj.diem = diem
+            obj.save()
+        except:
+            continue
+    return JsonResponse({'message': 'Upload điểm thành công', 'status': 'success'})
+
+
+@permission_classes((permissions.IsAuthenticated, isGiangVien,))
+@api_view(['GET'])
+def downloadFileToUpload(request):
+    idPhongThi = request.GET.get('idPhongThi')
+    if idPhongThi:
+        queryset = DiemThi.objects.filter(phongThi__id=idPhongThi)
+        fullDiem = []
+        for diem in queryset:
+            fullDiem.append(
+                {"sinhVien": diem.sinhVien.sid, "diem": 0})
+        output = io.BytesIO()
+        book = Workbook(output, {'in_memory': True})
+        sheet = book.add_worksheet()
+        row = 0
+        column = 0
+        for item in fullDiem:
+            sheet.write(row, column, item['sinhVien'])
+            sheet.write(row, column+1, item['diem'])
+            row = row + 1
+        book.close()
+        output.seek(0)
+        tenfile = unidecode.unidecode(
+            PhongThi.objects.get(id=idPhongThi).tenPhongThi)
+        tenfile = tenfile.replace(" ", "")
+        tenfile += ".xlsx"
+        tenfile = "DS-" + tenfile
+        response = HttpResponse(output.read(
+        ), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = "attachment; filename=%s" % tenfile
+        return response
+    else:
+        return Http404
 
 
 class schoolViewPhongThi(viewsets.GenericViewSet, mixins.ListModelMixin, mixins.RetrieveModelMixin):

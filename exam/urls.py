@@ -1,7 +1,7 @@
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
 
-from .views import download, gvThemDeThi, gvCTDT, gvViewAllDiem, gvViewDeTuLuan, gvViewPhongThi, schoolViewAllDiem, schoolViewPhongThi, svCTDT, svViewGetDeThi, svViewGetDeThiTuLuan, svViewGetKeyDeThi, svViewLamBai, svViewLambaiTuluan, svViewListPhongThi
+from .views import downloadFileToUpload, getDanhSachBaiThiTuLuan, getDanhSachDiemThi, gvThemDeThi, gvCTDT, gvViewAllDiem, gvViewBaiLamTuLuan, gvViewDeTuLuan, gvViewPhongThi, schoolViewAllDiem, schoolViewPhongThi, svCTDT, svViewGetDeThi, svViewGetDeThiTuLuan, svViewGetKeyDeThi, svViewLamBai, svViewLambaiTuluan, svViewListPhongThi, uploadDiemThi
 
 router = DefaultRouter()
 router.register("sv/phong-thi", svViewListPhongThi, basename="svViewPhongThi")
@@ -23,9 +23,15 @@ router.register("gv/de-tu-luan", gvViewDeTuLuan,
 router.register("gv/ctdt", gvCTDT, basename="GiangViengetCTDT")
 router.register("gv/diem-thi", gvViewAllDiem,
                 basename="Giảng viên xem điểm 1 phòng thi")
+router.register("gv/bai-thi-tu-luan", gvViewBaiLamTuLuan,
+                basename="GiangVien xem các bài thi tự luận")
 router.register("school/phong-thi", schoolViewPhongThi,
                 basename='Trường xem danh sách phòng thi')
 router.register("school/diem-thi", schoolViewAllDiem,
                 basename="Trường xem điểm phòng thi")
 exam_urlpatterns = [url("api/", include(router.urls))]
-exam_urlpatterns += [url("api/gv/diem-phong-thi/", download)]
+exam_urlpatterns += [url("api/gv/diem-phong-thi/", getDanhSachDiemThi)]
+exam_urlpatterns += [url("api/gv/danh-sach-bai-thi/", getDanhSachBaiThiTuLuan)]
+exam_urlpatterns += [url("api/gv/upload-diem-tu-luan/", uploadDiemThi)]
+exam_urlpatterns += [url("api/gv/download-file-diem-tu-luan/",
+                         downloadFileToUpload)]
